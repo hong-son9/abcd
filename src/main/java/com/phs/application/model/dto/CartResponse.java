@@ -1,19 +1,28 @@
 package com.phs.application.model.dto;
 
-import com.phs.application.entity.Cart;
-import com.phs.application.entity.Product;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
+import java.util.ArrayList;
+
+@AllArgsConstructor
+@NoArgsConstructor
+@Setter
+@Getter
 public class CartResponse {
-    private Long id;
+    private Long cartId;
     private Long userId;
-    private ProductDTO product;
+    private String productId;
+    private int quantity;
+    private String productName;
+    private long productPrice;
+    private long productSalePrice;
+    private long productTotalSold;
+    private int productStatus;
+    private ArrayList<String> productImages;
+    private String status;
+    private String message;
 
-    public CartResponse(Cart cartItem) {
-        this.id = cartItem.getId(); // Lấy giá trị id từ Cart
-        this.userId = cartItem.getUser().getId(); // Lấy userId từ Cart
-
-        // Chuyển đổi từ Product sang ProductDTO
-        Product product = cartItem.getProduct();
-        this.product = new ProductDTO(product);
-    }
 }

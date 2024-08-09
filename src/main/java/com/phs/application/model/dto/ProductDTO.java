@@ -23,6 +23,4 @@ public class ProductDTO {
     private ArrayList<String> images;
     private ArrayList<String> feedBackImages;
 
-    public ProductDTO(Product product) {
-    }
 }
