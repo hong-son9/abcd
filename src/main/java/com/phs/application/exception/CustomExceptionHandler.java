@@ -47,8 +47,9 @@ public class CustomExceptionHandler {
     //Xử lý các exception chưa được khai báo
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Object> handlerException(Exception ex, WebRequest request) {
-        ErrorResponse error = new ErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage());
-        return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
+////        ErrorResponse error = new ErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage());
+//        return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
+        return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
 

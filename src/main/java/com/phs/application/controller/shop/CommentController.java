@@ -30,8 +30,7 @@ public class CommentController {
 
     @PostMapping("/api/comments/product")
     public ResponseEntity<Object> createComment(@Valid @RequestBody CreateCommentProductRequest createCommentProductRequest) {
-        User user = ((CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUser();
-        Comment comment = commentService.createCommentProduct(createCommentProductRequest, user.getId());
+        Comment comment = commentService.createCommentProduct(createCommentProductRequest, createCommentProductRequest.getUserId());
         return ResponseEntity.ok(comment);
     }
 }

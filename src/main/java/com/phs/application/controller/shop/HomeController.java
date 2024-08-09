@@ -1,6 +1,7 @@
 package com.phs.application.controller.shop;
 
 import com.phs.application.entity.*;
+import com.phs.application.model.response.ProductResponse;
 import com.phs.application.service.*;
 import com.phs.application.entity.*;
 import com.phs.application.exception.BadRequestException;
@@ -22,10 +23,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static com.phs.application.config.Contant.*;
 
@@ -169,11 +167,25 @@ public class HomeController {
         return ResponseEntity.ok(order.getId());
     }
 
+//    @GetMapping("/products")
+//    public ResponseEntity<Object> getListBestSellProducts(){
+//        List<ProductInfoDTO> productInfoDTOS = productService.getListBestSellProducts();
+//        return ResponseEntity.ok(productInfoDTOS);
+//    }
     @GetMapping("/products")
-    public ResponseEntity<Object> getListBestSellProducts(){
-        List<ProductInfoDTO> productInfoDTOS = productService.getListBestSellProducts();
-        return ResponseEntity.ok(productInfoDTOS);
+    public ResponseEntity<ProductResponse> getListBestSellProducts(){
+        try {
+            List<ProductInfoDTO> productInfoDTOS = productService.getListBestSellProducts();
+            // Trả về danh sách sản phẩm và trạng thái thành công
+            ProductResponse response = new ProductResponse(productInfoDTOS,"OK","SUCCSESS");
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            // Trả về lỗi nếu có vấn đề
+            ProductResponse errorResponse = new ProductResponse(null, "INTERNAL_SERVER_ERROR", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
+        }
     }
+
 
 
     @GetMapping("/san-pham")
@@ -280,42 +292,33 @@ public class HomeController {
     }
     @GetMapping("/chitiet/{slug}/{id}")
     public ResponseEntity<?> getProductDetail1(@PathVariable String id) {
-        // Lấy thông tin sản phẩm
-        DetailProductInfoDTO product;
         try {
-            product = productService.getDetailProductById(id);
+            DetailProductInfoDTO product = productService.getDetailProductById(id);
+
+            Map<String, Object> response = new HashMap<>();
+            response.put("product", product);
+
+            // Lấy size có sẵn
+            List<Integer> availableSizes = productService.getListAvailableSize(id);
+            response.put("availableSizes", availableSizes);
+
+            // Đặt thuộc tính "canBuy" dựa trên size có sẵn
+            response.put("canBuy", !availableSizes.isEmpty());
+
+            // Lấy danh sách size giầy
+            response.put("sizeVn", SIZE_VN);
+            response.put("sizeUs", SIZE_US);
+            response.put("sizeCm", SIZE_CM);
+
+            return ResponseEntity.ok(response);
+
         } catch (NotFoundException ex) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Product not found");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Collections.singletonMap("error", "Product not found"));
         } catch (Exception ex) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Internal server error");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Collections.singletonMap("error", "Internal server error"));
         }
-
-        // Tạo một map để chứa tất cả các dữ liệu cần trả về
-        Map<String, Object> response = new HashMap<>();
-        response.put("product", product);
-
-        // Lấy sản phẩm liên quan
-        List<ProductInfoDTO> relatedProducts = productService.getRelatedProducts(id);
-        response.put("relatedProducts", relatedProducts);
-
-        // Lấy danh sách nhãn hiệu
-        List<Brand> brands = brandService.getListBrand();
-        response.put("brands", brands);
-
-        // Lấy size có sẵn
-        List<Integer> availableSizes = productService.getListAvailableSize(id);
-        response.put("availableSizes", availableSizes);
-
-        // Đặt thuộc tính "canBuy" dựa trên size có sẵn
-        response.put("canBuy", !availableSizes.isEmpty());
-
-        // Lấy danh sách size giầy
-        response.put("sizeVn", SIZE_VN);
-        response.put("sizeUs", SIZE_US);
-        response.put("sizeCm", SIZE_CM);
-
-        return ResponseEntity.ok(response);
     }
+
     @GetMapping("lien-he")
     public String contact(){
         return "shop/lien-he";

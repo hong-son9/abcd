@@ -15,4 +15,7 @@ public class CreateCommentProductRequest {
     private String productId;
     @NotBlank(message = "Nội dung bình luận trống!")
     private String content;
+
+    private Long userId;
 }
+
