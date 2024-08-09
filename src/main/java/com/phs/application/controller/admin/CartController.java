@@ -15,22 +15,25 @@ import java.util.stream.Collectors;
 @RequestMapping("/api/cart")
 public class CartController {
 
-    @Autowired
-    private CartService cartItemService;
+    private final CartService cartService;
+
+    public CartController(CartService cartService) {
+        this.cartService = cartService;
+    }
 
     @PostMapping("/addOrUpdateCart")
-    public ResponseEntity<CartResponse> addOrUpdateCartItem(
+    public ResponseEntity<Cart> addOrUpdateCartItem(
             @RequestParam Long userId,
             @RequestParam String productId) {
 
         // Gọi dịch vụ để thêm hoặc cập nhật mục giỏ hàng
-        Cart cartItem = cartItemService.addOrUpdateCartItem(userId, productId);
+        Cart cartItem = cartService.addOrUpdateCartItem(userId, productId);
 
         // Tạo đối tượng CartResponse từ Cart
-        CartResponse cartResponse = new CartResponse(cartItem);
+//        CartResponse cartResponse = new CartResponse(cartItem);
 
         // Trả về phản hồi
-        return ResponseEntity.ok(cartResponse);
+        return ResponseEntity.ok(cartItem);
     }
 //    @PostMapping("/addOrUpdate")
 //    public ResponseEntity<CartResponse> addOrUpdate(@RequestBody CartRequest cartRequest) {
@@ -45,7 +48,7 @@ public class CartController {
     @GetMapping("/cart/{userId}")
     public ResponseEntity<List<CartResponse>> getCartByIdUser(@PathVariable Long userId) {
         // Lấy danh sách các mục trong giỏ hàng của người dùng theo userId
-        List<Cart> cartItems = cartItemService.getCartItemsByUserId(userId);
+        List<Cart> cartItems = cartService.getCartItemsByUserId(userId);
 
         // Chuyển đổi danh sách CartItem thành danh sách CartResponse
         List<CartResponse> cartResponses = cartItems.stream()
@@ -56,9 +59,9 @@ public class CartController {
         return ResponseEntity.ok(cartResponses);
     }
 
-    @DeleteMapping("/xóa/{userId}/{productId}")
-    public ResponseEntity<Void> removeCart(@PathVariable Long userId, @PathVariable String productId) {
-        cartItemService.removeCartItem(userId, productId);
-        return ResponseEntity.noContent().build();
-    }
+//    @DeleteMapping("/xóa/{userId}/{productId}")
+//    public ResponseEntity<Void> removeCart(@PathVariable Long userId, @PathVariable String productId) {
+//        cartItemService.removeCartItem(userId, productId);
+//        return ResponseEntity.noContent().build();
+//    }
 }

@@ -29,15 +29,27 @@ public class CartService {
 
     public Cart addOrUpdateCartItem(Long userId, String productId) {
         Cart cartItem = cartItemRepository.findByUserIdAndProductId(userId, productId);
-            User user = userRepository.findById(userId)
-                    .orElseThrow(() -> new RuntimeException("User not found with id: " + userId));
-            Product product = productRepository.findById(productId)
-                    .orElseThrow(() -> new RuntimeException("Product not found with id: " + productId));
-            System.out.println(product.toString());
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found with id: " + userId));
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new RuntimeException("Product not found with id: " + productId));
+
+        if (cartItem != null) {
+            // If the cart item exists, you can update the quantity or other attributes here
+            // For example, increasing quantity:
+//            cartItem.setQuantity(cartItem.getQuantity() + 1);
+        } else {
+            // If the cart item doesn't exist, create a new one
+            cartItem = new Cart();
             cartItem.setUser(user);
             cartItem.setProduct(product);
+//            cartItem.setQuantity(1); // Initialize quantity or other attributes as needed
+        }
+        System.out.println(product.toString());
         return cartItemRepository.save(cartItem);
     }
+
 
     public void removeCartItem(Long userId, String productId) {
         Cart cartItem = cartItemRepository.findByUserIdAndProductId(userId, productId);
