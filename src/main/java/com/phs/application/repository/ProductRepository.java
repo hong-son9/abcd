@@ -1,7 +1,9 @@
 package com.phs.application.repository;
 
+import com.phs.application.entity.Comment;
 import com.phs.application.entity.Product;
 import com.phs.application.model.dto.ChartDTO;
+import com.phs.application.model.dto.CommentDTO;
 import com.phs.application.model.dto.ProductInfoDTO;
 import com.phs.application.model.dto.ShortProductInfoDTO;
 import org.springframework.data.domain.Page;
@@ -122,4 +124,6 @@ public interface ProductRepository extends JpaRepository<Product, String> {
 
     @Query(name = "getProductOrders",nativeQuery = true)
     List<ChartDTO> getProductOrders(Pageable pageable, Integer moth, Integer year);
+
+
 }

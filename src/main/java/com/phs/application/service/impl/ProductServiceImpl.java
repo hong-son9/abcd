@@ -1,19 +1,14 @@
 package com.phs.application.service.impl;
 
+import com.phs.application.entity.Comment;
 import com.phs.application.exception.BadRequestException;
 import com.phs.application.exception.InternalServerException;
 import com.phs.application.exception.NotFoundException;
-import com.phs.application.repository.OrderRepository;
-import com.phs.application.repository.ProductRepository;
-import com.phs.application.repository.ProductSizeRepository;
-import com.phs.application.repository.PromotionRepository;
+import com.phs.application.model.dto.*;
+import com.phs.application.repository.*;
 import com.phs.application.entity.Product;
 import com.phs.application.entity.ProductSize;
 import com.phs.application.entity.Promotion;
-import com.phs.application.model.dto.DetailProductInfoDTO;
-import com.phs.application.model.dto.PageableDTO;
-import com.phs.application.model.dto.ProductInfoDTO;
-import com.phs.application.model.dto.ShortProductInfoDTO;
 import com.phs.application.model.mapper.ProductMapper;
 import com.phs.application.model.request.CreateProductRequest;
 import com.phs.application.model.request.CreateSizeCountRequest;
@@ -55,6 +50,8 @@ public class ProductServiceImpl implements ProductService {
     @Autowired
     private OrderRepository orderRepository;
 
+    @Autowired
+    private CommentDTORepository commentDTORepository;
     @Override
     public Page<Product> adminGetListProduct(String id, String name, String category, String brand, Integer page) {
         page--;
@@ -215,7 +212,9 @@ public class ProductServiceImpl implements ProductService {
         dto.setBrand(product.getBrand());
         dto.setFeedbackImages(product.getImageFeedBack());
         dto.setProductImages(product.getImages());
-        dto.setComments(product.getComments());
+        List<CommentDTO> comments = commentDTORepository.getCommentByProductId(product.getId());
+        dto.setComments(comments);
+//        dto.setComments(comments);
 
         //Cộng sản phẩm xem
         product.setView(product.getView() + 1);
