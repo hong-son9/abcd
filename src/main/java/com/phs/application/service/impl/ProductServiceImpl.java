@@ -191,7 +191,6 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public DetailProductInfoDTO getDetailProductById(String id) {
         Optional<Product> rs = productRepository.findById(id);
-        System.out.println(id);
         if (rs.isEmpty()) {
             throw new NotFoundException("Sản phẩm không tồn tại");
         }
@@ -200,11 +199,17 @@ public class ProductServiceImpl implements ProductService {
         if (product.getStatus() != 1) {
             throw new NotFoundException("Sản phẩm không tồn tại");
         }
+
+        // Lấy thông tin số lượng từ bảng product_size
+        List<ProductSize> productSizes = productSizeRepository.findByProductId(id);
+        int totalQuantity = productSizes.stream()
+                .mapToInt(ProductSize::getQuantity)
+                .sum();
         DetailProductInfoDTO dto = new DetailProductInfoDTO();
         dto.setId(product.getId());
         dto.setName(product.getName());
         dto.setPrice(product.getSalePrice());
-        dto.setQuantity(1);
+        dto.setQuantity(totalQuantity);  // Bạn có thể tính tổng số lượng từ các size nếu cần
         dto.setViews(product.getView());
         dto.setSlug(product.getSlug());
         dto.setTotalSold(product.getTotalSold());
@@ -212,15 +217,18 @@ public class ProductServiceImpl implements ProductService {
         dto.setBrand(product.getBrand());
         dto.setFeedbackImages(product.getImageFeedBack());
         dto.setProductImages(product.getImages());
+
+
+
+
         List<CommentDTO> comments = commentDTORepository.getCommentByProductId(product.getId());
         dto.setComments(comments);
-//        dto.setComments(comments);
 
-        //Cộng sản phẩm xem
+        // Cộng sản phẩm xem
         product.setView(product.getView() + 1);
         productRepository.save(product);
 
-        //Kiểm tra có khuyến mại
+        // Kiểm tra có khuyến mại
         Promotion promotion = promotionService.checkPublicPromotion();
         if (promotion != null) {
             dto.setCouponCode(promotion.getCouponCode());
@@ -230,7 +238,6 @@ public class ProductServiceImpl implements ProductService {
             dto.setPromotionPrice(dto.getPrice());
         }
         return dto;
-
     }
 
     @Override

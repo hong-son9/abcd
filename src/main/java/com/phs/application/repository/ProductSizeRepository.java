@@ -41,4 +41,5 @@ public interface ProductSizeRepository extends JpaRepository<ProductSize,Long> {
     @Modifying
     @Query(nativeQuery = true, value = "Delete from product_size where product_id = ?1")
     public void deleteByProductId(String id);
+
 }
