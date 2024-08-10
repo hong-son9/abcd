@@ -1,15 +1,11 @@
 package com.phs.application.controller.admin;
 
-import com.phs.application.entity.Cart;
 import com.phs.application.model.dto.CartResponse;
-import com.phs.application.model.request.CartRequest;
+import com.phs.application.model.response.ResponseOK;
 import com.phs.application.service.CartService;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/cart")
@@ -22,22 +18,33 @@ public class CartController {
     }
 
     @PostMapping("/addOrUpdateCart")
-    public ResponseEntity<CartResponse> addOrUpdateCartItem(
+    public ResponseEntity<ResponseOK> addOrUpdateCartItem(
             @RequestParam Long userId,
             @RequestParam String productId) {
 
         // Gọi dịch vụ để thêm hoặc cập nhật mục giỏ hàng và nhận phản hồi
-        CartResponse cartResponse = cartService.addOrUpdateCartItem(userId, productId);
+        ResponseOK responseOK = cartService.addOrUpdateCartItem(userId, productId);
+
+        // Trả về phản hồi với mã trạng thái HTTP 200 (OK) và đối tượng CartResponse
+        return ResponseEntity.ok(responseOK);
+    }
+
+    @GetMapping("/getCartByUserId")
+    public ResponseEntity<CartResponse> getCartByUserId(@RequestParam Long userId) {
+        // Gọi dịch vụ để lấy giỏ hàng theo ID người dùng
+        CartResponse cartResponse = cartService.getCartByUserId(userId);
 
         // Trả về phản hồi với mã trạng thái HTTP 200 (OK) và đối tượng CartResponse
         return ResponseEntity.ok(cartResponse);
     }
-    @GetMapping("/getCartByUserId")
-    public ResponseEntity<List<CartResponse>> getCartByUserId(@RequestParam Long userId) {
-        // Gọi dịch vụ để lấy giỏ hàng theo ID người dùng
-        List<CartResponse> cartResponses = cartService.getCartByUserId(userId);
-
-        // Trả về phản hồi với mã trạng thái HTTP 200 (OK) và danh sách CartResponse
-        return ResponseEntity.ok(cartResponses);
+    @DeleteMapping("/remove")
+    public ResponseEntity<ResponseOK> removeCartItem(@RequestParam Long userId, @RequestParam String productId) {
+        ResponseOK responseOK = cartService.removeCartItem(userId, productId);
+        return ResponseEntity.ok(responseOK);
+    }
+    @PutMapping("/decrease")
+    public ResponseEntity<ResponseOK> decreaseCartItemQuantity(@RequestParam Long userId, @RequestParam String productId) {
+        ResponseOK responseOK = cartService.decreaseCartItemQuantity(userId, productId);
+        return ResponseEntity.ok(responseOK);
     }
 }
