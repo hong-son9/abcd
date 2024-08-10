@@ -17,6 +17,8 @@ public class CartResponseDTO {
     private String name;
     private String slug;
     private long price;
+    private int quantity;
     private ArrayList<String> images;
     private Long totalSold;
+    private Long total_money;
 }

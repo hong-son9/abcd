@@ -113,8 +113,10 @@ public CartResponse getCartByUserId(Long userId) {
                 product.getName(),
                 product.getSlug(),
                 product.getPrice(),
+                cartItem.getQuantity(),
                 product.getImages(),
-                product.getTotalSold()
+                product.getTotalSold(),
+                cartItem.getQuantity() * product.getPrice()
         );
 
         productResponses.add(productResponse);
