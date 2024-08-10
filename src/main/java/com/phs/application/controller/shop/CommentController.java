@@ -4,6 +4,7 @@ import com.phs.application.entity.Comment;
 import com.phs.application.entity.User;
 import com.phs.application.model.request.CreateCommentPostRequest;
 import com.phs.application.model.request.CreateCommentProductRequest;
+import com.phs.application.model.response.ResponseOK;
 import com.phs.application.security.CustomUserDetails;
 import com.phs.application.service.CommentService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,6 +32,7 @@ public class CommentController {
     @PostMapping("/api/comments/product")
     public ResponseEntity<Object> createComment(@Valid @RequestBody CreateCommentProductRequest createCommentProductRequest) {
         Comment comment = commentService.createCommentProduct(createCommentProductRequest, createCommentProductRequest.getUserId());
-        return ResponseEntity.ok(comment);
+        ResponseOK response = new ResponseOK("200","SUCCCESS","Thêm bình luận thành công");
+        return ResponseEntity.ok(response);
     }
 }

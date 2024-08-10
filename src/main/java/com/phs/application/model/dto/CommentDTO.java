@@ -23,6 +23,7 @@ public class CommentDTO {
     private String content;
 
     private long userId;
+    private String full_name;
 
 //    private String product;
 
