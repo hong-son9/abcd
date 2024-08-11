@@ -150,5 +150,16 @@ public CartResponse getCartByUserId(Long userId) {
 
         return new ResponseOK("200","OK", "SUCCESS");
     }
+    public ResponseOK removeCartItemsByUserId(Long userId) {
+        // Tìm tất cả các sản phẩm trong giỏ hàng của người dùng
+        List<Cart> cartItems = cartItemRepository.findByUserId(userId);
+
+        // Xóa tất cả sản phẩm khỏi giỏ hàng
+        if (!cartItems.isEmpty()) {
+            cartItemRepository.deleteAll(cartItems);
+        }
+
+        return new ResponseOK("200", "OK", "SUCCESS");
+    }
 
 }

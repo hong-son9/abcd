@@ -47,4 +47,9 @@ public class CartController {
         ResponseOK responseOK = cartService.decreaseCartItemQuantity(userId, productId);
         return ResponseEntity.ok(responseOK);
     }
+    @DeleteMapping("/removeCartItemsByUserId")
+    public ResponseEntity<ResponseOK> removeCartItemsByUserId(@RequestParam Long userId) {
+        ResponseOK responseOK = cartService.removeCartItemsByUserId(userId);
+        return ResponseEntity.ok(responseOK);
+    }
 }
