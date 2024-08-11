@@ -2,7 +2,6 @@ package com.phs.application.model.response;
 
 public class ResponseOK {
     private String resultCode;
-
     private String status;
     private String message;
 
