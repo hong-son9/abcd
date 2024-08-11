@@ -1,10 +1,6 @@
 package com.phs.application.controller.shop;
 
 import com.phs.application.entity.*;
-import com.phs.application.model.request.CreateOrderRequestV2;
-import com.phs.application.model.response.ProductResponse;
-import com.phs.application.service.*;
-import com.phs.application.entity.*;
 import com.phs.application.exception.BadRequestException;
 import com.phs.application.exception.NotFoundException;
 import com.phs.application.model.dto.CheckPromotion;
@@ -12,9 +8,13 @@ import com.phs.application.model.dto.DetailProductInfoDTO;
 import com.phs.application.model.dto.PageableDTO;
 import com.phs.application.model.dto.ProductInfoDTO;
 import com.phs.application.model.request.CreateOrderRequest;
+import com.phs.application.model.request.CreateOrderRequestV2;
 import com.phs.application.model.request.FilterProductRequest;
+import com.phs.application.model.request.UpdateStatusOrderRequest;
+import com.phs.application.model.response.ProductResponse;
 import com.phs.application.security.CustomUserDetails;
 import com.phs.application.service.*;
+import com.phs.application.service.impl.OrderServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -44,13 +44,16 @@ public class HomeController {
     private OrderService orderService;
 
     @Autowired
+    private OrderServiceImpl orderServiceImpl;
+
+    @Autowired
     private CategoryService categoryService;
 
     @Autowired
     private PromotionService promotionService;
 
     @GetMapping
-    public String homePage(Model model){
+    public String homePage(Model model) {
 
         //Lấy 5 sản phẩm mới nhất
         List<ProductInfoDTO> newProducts = productService.getListNewProducts();
@@ -66,7 +69,7 @@ public class HomeController {
 
         //Lấy danh sách nhãn hiệu
         List<Brand> brands = brandService.getListBrand();
-        model.addAttribute("brands",brands);
+        model.addAttribute("brands", brands);
 
         //Lấy 5 bài viết mới nhất
         List<Post> posts = postService.getLatesPost();
@@ -76,7 +79,7 @@ public class HomeController {
     }
 
     @GetMapping("/{slug}/{id}")
-    public String getProductDetail(Model model, @PathVariable String id){
+    public String getProductDetail(Model model, @PathVariable String id) {
 
         //Lấy thông tin sản phẩm
         DetailProductInfoDTO product;
@@ -95,7 +98,7 @@ public class HomeController {
 
         //Lấy danh sách nhãn hiệu
         List<Brand> brands = brandService.getListBrand();
-        model.addAttribute("brands",brands);
+        model.addAttribute("brands", brands);
 
         // Lấy size có sẵn
         List<Integer> availableSizes = productService.getListAvailableSize(id);
@@ -115,7 +118,7 @@ public class HomeController {
     }
 
     @GetMapping("/dat-hang")
-    public String getCartPage(Model model, @RequestParam String id,@RequestParam int size, @RequestParam int quantity){
+    public String getCartPage(Model model, @RequestParam String id, @RequestParam int size, @RequestParam int quantity) {
 
         //Lấy chi tiết sản phẩm
         DetailProductInfoDTO product;
@@ -169,24 +172,46 @@ public class HomeController {
     }
 
     @PostMapping("/api/orders/v2")
-    public ResponseEntity<Object> createOrderV2( @RequestBody CreateOrderRequestV2 createOrderRequest) {
+    public ResponseEntity<Object> createOrderV2(@RequestBody CreateOrderRequestV2 createOrderRequest) {
 //        User user = ((CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUser();
         List<Number> order = orderService.createOrderV2(createOrderRequest, createOrderRequest.getUserId());
 
         return ResponseEntity.ok(order);
     }
 
-//    @GetMapping("/products")
+    @GetMapping("/api/orders")
+    public ResponseEntity<Object> getOrder(@RequestParam(name = "status", required = false) Integer status, @RequestParam(name = "buyer", required = false) Long buyer) {
+        return ResponseEntity.ok(orderServiceImpl.getSummary(buyer, status));
+    }
+
+    @GetMapping("/api/orders/status")
+    public ResponseEntity<Object> getOrderByStatus(@RequestParam(name = "status", required = false) Integer status) {
+        return ResponseEntity.ok(orderServiceImpl.getByStatus(status));
+    }
+
+    @GetMapping("/api/orders/detail")
+    public ResponseEntity<Object> getOrderDetail(@RequestParam(name = "billCode") String billCode) {
+        return ResponseEntity.ok(orderServiceImpl.getDetailByBillCode(billCode));
+    }
+
+    @PostMapping("/api/update/status")
+    public ResponseEntity<Object> updateStatus(@RequestBody UpdateStatusOrderRequest updateStatusOrderRequest, @RequestParam(name = "billCode") String billCode, @RequestParam(name = "userId") long userId) {
+        orderServiceImpl.updateStatusOrderV2(updateStatusOrderRequest, billCode, userId);
+        return ResponseEntity.ok("Cập nhật trạng thái thành công");
+    }
+
+
+    //    @GetMapping("/products")
 //    public ResponseEntity<Object> getListBestSellProducts(){
 //        List<ProductInfoDTO> productInfoDTOS = productService.getListBestSellProducts();
 //        return ResponseEntity.ok(productInfoDTOS);
 //    }
     @GetMapping("/products")
-    public ResponseEntity<ProductResponse> getListBestSellProducts(){
+    public ResponseEntity<ProductResponse> getListBestSellProducts() {
         try {
             List<ProductInfoDTO> productInfoDTOS = productService.getListBestSellProducts();
             // Trả về danh sách sản phẩm và trạng thái thành công
-            ProductResponse response = new ProductResponse(productInfoDTOS,"OK","SUCCSESS");
+            ProductResponse response = new ProductResponse(productInfoDTOS, "OK", "SUCCSESS");
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             // Trả về lỗi nếu có vấn đề
@@ -196,13 +221,12 @@ public class HomeController {
     }
 
 
-
     @GetMapping("/san-pham")
-    public String getProductShopPages(Model model){
+    public String getProductShopPages(Model model) {
 
         //Lấy danh sách nhãn hiệu
         List<Brand> brands = brandService.getListBrand();
-        model.addAttribute("brands",brands);
+        model.addAttribute("brands", brands);
         List<Long> brandIds = new ArrayList<>();
         for (Brand brand : brands) {
             brandIds.add(brand.getId());
@@ -211,7 +235,7 @@ public class HomeController {
 
         //Lấy danh sách danh mục
         List<Category> categories = categoryService.getListCategories();
-        model.addAttribute("categories",categories);
+        model.addAttribute("categories", categories);
         List<Long> categoryIds = new ArrayList<>();
         for (Category category : categories) {
             categoryIds.add(category.getId());
@@ -271,6 +295,7 @@ public class HomeController {
 
         return "shop/search";
     }
+
     @GetMapping("/api/tim-kiem/{keyword}/{page}")
     public ResponseEntity<PageableDTO> searchProduct(
             @PathVariable String keyword,
@@ -280,7 +305,6 @@ public class HomeController {
 
         return ResponseEntity.ok(result);
     }
-
 
 
     @GetMapping("/api/check-hidden-promotion")
@@ -299,6 +323,7 @@ public class HomeController {
         checkPromotion.setMaximumDiscountValue(promotion.getMaximumDiscountValue());
         return ResponseEntity.ok(checkPromotion);
     }
+
     @GetMapping("/chitiet/{slug}/{id}")
     public ResponseEntity<?> getProductDetail1(@PathVariable String id) {
         try {
@@ -329,15 +354,17 @@ public class HomeController {
     }
 
     @GetMapping("lien-he")
-    public String contact(){
+    public String contact() {
         return "shop/lien-he";
     }
+
     @GetMapping("huong-dan")
-    public String buyGuide(){
+    public String buyGuide() {
         return "shop/buy-guide";
     }
+
     @GetMapping("doi-hang")
-    public String doiHang(){
+    public String doiHang() {
         return "shop/doi-hang";
     }
 
