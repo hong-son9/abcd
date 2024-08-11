@@ -15,7 +15,7 @@ public class ProductSizeRepositoryImpl {
     private NamedParameterJdbcTemplate template;
 
     public int update(ProductSize request) {
-        String sql = "Update product_size set quantity = quantity - :quantity where product_id = :productId and size = :size";
+            String sql = "Update product_size set quantity = quantity - :quantity where product_id = :productId and size = :size";
         MapSqlParameterSource param = new MapSqlParameterSource();
         param.addValue("quantity", request.getQuantity());
         param.addValue("productId", request.getProductId());

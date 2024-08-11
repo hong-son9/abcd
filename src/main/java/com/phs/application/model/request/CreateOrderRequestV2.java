@@ -36,4 +36,6 @@ public class CreateOrderRequestV2 {
 
     private String note;
 
+    private long userId;
+
 }

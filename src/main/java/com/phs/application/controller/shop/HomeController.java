@@ -170,8 +170,8 @@ public class HomeController {
 
     @PostMapping("/api/orders/v2")
     public ResponseEntity<Object> createOrderV2( @RequestBody CreateOrderRequestV2 createOrderRequest) {
-        User user = ((CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUser();
-        List<Number> order = orderService.createOrderV2(createOrderRequest, user.getId());
+//        User user = ((CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUser();
+        List<Number> order = orderService.createOrderV2(createOrderRequest, createOrderRequest.getUserId());
 
         return ResponseEntity.ok(order);
     }
