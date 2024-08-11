@@ -20,8 +20,6 @@ public class ProductSizeRepositoryImpl {
         param.addValue("quantity", request.getQuantity());
         param.addValue("productId", request.getProductId());
         param.addValue("size", request.getSize());
-
-
         return template.update(sql, param);
     }
 }
