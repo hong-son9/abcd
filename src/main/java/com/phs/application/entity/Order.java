@@ -129,6 +129,7 @@ public class Order {
     private UsedPromotion promotion;
 
     private String productIds;
+    private String billCode;
 
     @Getter
     @Setter

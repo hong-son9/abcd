@@ -27,6 +27,7 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import static com.phs.application.config.Contant.*;
 
@@ -359,30 +360,32 @@ public class OrderServiceImpl implements OrderService {
 
         List<Number> res = new ArrayList<>();
 
+        String uuid = UUID.randomUUID().toString();
         for (ProductSize proId : createOrderRequest.getProducts()) {
             ProductSize productSize = productSizeRepository.checkProductAndSizeAvailable(proId.getProductId(), proId.getSize());
             if (productSize == null) {
                 throw new BadRequestException("sản phẩm tạm hết, Vui lòng chọn sản phẩm khác!");
             }
 //            trừ số lượng sp
-            productSizeRepositoryImpl.update(productSize);
+            productSizeRepositoryImpl.update(proId);
 //             insert dữ liệu vào bảng map
             Order order = new Order();
             User user = new User();
             user.setId(userId);
             order.setCreatedBy(user);
-            order.setQuantity(createOrderRequest.getProducts().size());
+            order.setQuantity(proId.getQuantity());
             order.setBuyer(user);
             order.setCreatedAt(new Timestamp(System.currentTimeMillis()));
             order.setReceiverAddress(createOrderRequest.getReceiverAddress());
             order.setReceiverName(createOrderRequest.getReceiverName());
             order.setReceiverPhone(createOrderRequest.getReceiverPhone());
             order.setNote(createOrderRequest.getNote());
-//        order.setSize(createOrderRequest.getSize());
             order.setPrice(createOrderRequest.getProductPrice());
-            order.setTotalPrice(createOrderRequest.getProductPrice() - createOrderRequest.getTotalPrice());
+            order.setTotalPrice(createOrderRequest.getTotalPrice());
             order.setStatus(ORDER_STATUS);
             order.setProductIds(productSize.getProductId());
+            order.setBillCode(uuid);
+            order.setSize(proId.getSize());;
             KeyHolder keyHolder = new GeneratedKeyHolder();
             orderRepositoryImpl .save(order,keyHolder);
             Number id = keyHolder.getKey();

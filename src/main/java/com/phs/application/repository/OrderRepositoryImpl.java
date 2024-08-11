@@ -21,9 +21,9 @@ public class OrderRepositoryImpl {
 
     public int save(Order request, KeyHolder keyHolder) {
         String sql = "INSERT INTO orders(created_at, note, price, promotion, quantity, receiver_address, receiver_name,\n" +
-                "                   receiver_phone, status, total_price, buyer, created_by)\n" +
+                "                   receiver_phone, status, total_price, buyer, created_by,product_id,bill_code)\n" +
                 "VALUES (:created_at, :note, :price, :promotion, :quantity, :receiver_address, :receiver_name,\n" +
-                "        :receiver_phone, :status, :total_price, :buyer, :created_by)\n";
+                "        :receiver_phone, :status, :total_price, :buyer, :created_by,:product_id,:bill_code)\n";
         MapSqlParameterSource param = new MapSqlParameterSource();
         param.addValue("created_at", request.getCreatedAt());
         param.addValue("note", request.getNote());
@@ -37,6 +37,8 @@ public class OrderRepositoryImpl {
         param.addValue("total_price", request.getTotalPrice());
         param.addValue("buyer", request.getBuyer().getId());
         param.addValue("created_by", request.getCreatedBy().getId());
+        param.addValue("product_id", request.getProductIds());
+        param.addValue("bill_code", request.getBillCode());
 
         return template.update(sql, param,keyHolder);
     }
@@ -57,4 +59,8 @@ public class OrderRepositoryImpl {
 
         return result;
     }
+
+//    public List<Order> getByUserId(long userId){
+//
+//    }
 }
