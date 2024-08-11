@@ -4,6 +4,7 @@ import com.phs.application.entity.Order;
 import com.phs.application.model.dto.OrderDetailDTO;
 import com.phs.application.model.dto.OrderInfoDTO;
 import com.phs.application.model.request.CreateOrderRequest;
+import com.phs.application.model.request.CreateOrderRequestV2;
 import com.phs.application.model.request.UpdateDetailOrder;
 import com.phs.application.model.request.UpdateStatusOrderRequest;
 import org.springframework.data.domain.Page;
@@ -18,6 +19,7 @@ public interface OrderService {
     Order createOrder(CreateOrderRequest createOrderRequest, long userId);
 
     void updateDetailOrder(UpdateDetailOrder updateDetailOrder, long id, long userId);
+    void updateStatusOrderV2(UpdateStatusOrderRequest updateDetailOrder, String billCode, long userId);
 
     Order findOrderById(long id);
 
@@ -32,4 +34,5 @@ public interface OrderService {
     //Đếm số lượng đơn hàng
     long getCountOrder();
 
+    List<Number> createOrderV2(CreateOrderRequestV2 createOrderRequest, long id);
 }
