@@ -52,4 +52,5 @@ public class CartController {
         ResponseOK responseOK = cartService.removeCartItemsByUserId(userId);
         return ResponseEntity.ok(responseOK);
     }
+
 }
