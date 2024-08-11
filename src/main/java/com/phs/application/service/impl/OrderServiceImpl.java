@@ -10,6 +10,8 @@ import com.phs.application.model.request.CreateOrderRequest;
 import com.phs.application.model.request.CreateOrderRequestV2;
 import com.phs.application.model.request.UpdateDetailOrder;
 import com.phs.application.model.request.UpdateStatusOrderRequest;
+import com.phs.application.model.response.OrderDetailResponse;
+import com.phs.application.model.response.OrderResponse;
 import com.phs.application.repository.*;
 import com.phs.application.service.OrderService;
 import com.phs.application.service.PromotionService;
@@ -267,6 +269,98 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
+    public void updateStatusOrderV2(UpdateStatusOrderRequest updateStatusOrderRequest, String billCode, long userId) {
+        List<Long> ls = orderRepository.findByBillCode(billCode);
+        if (ls.isEmpty()) {
+            throw new NotFoundException("Đơn hàng không tồn tại");
+        }
+        for (Long item : ls){
+            Optional<Order> rs = orderRepository.findById(item);
+            if (rs.isEmpty()) {
+                throw new NotFoundException("Đơn hàng không tồn tại");
+            }
+            Order order = rs.get();
+            //Kiểm tra trạng thái của đơn hàng
+            boolean check = false;
+            for (Integer status : LIST_ORDER_STATUS) {
+                if (status == updateStatusOrderRequest.getStatus()) {
+                    check = true;
+                    break;
+                }
+            }
+            if (!check) {
+                throw new BadRequestException("Trạng thái đơn hàng không hợp lệ");
+            }
+            //Cập nhật trạng thái đơn hàng
+            if (order.getStatus() == ORDER_STATUS) {
+                //Đơn hàng ở trạng thái chờ lấy hàng
+                if (updateStatusOrderRequest.getStatus() == ORDER_STATUS) {
+                    order.setReceiverPhone(updateStatusOrderRequest.getReceiverPhone());
+                    order.setReceiverName(updateStatusOrderRequest.getReceiverName());
+                    order.setReceiverAddress(updateStatusOrderRequest.getReceiverAddress());
+                    //Đơn hàng ở trạng thái đang vận chuyển
+                } else if (updateStatusOrderRequest.getStatus() == DELIVERY_STATUS) {
+                    //Trừ đi một sản phẩm
+                    productSizeRepository.minusOneProductBySize(order.getProduct().getId(), order.getSize());
+                    //Đơn hàng ở trạng thái đã giao hàng
+                } else if (updateStatusOrderRequest.getStatus() == COMPLETED_STATUS) {
+                    //Trừ đi một sản phẩm và cộng một sản phẩm vào sản phẩm đã bán và cộng tiền
+                    productSizeRepository.minusOneProductBySize(order.getProduct().getId(), order.getSize());
+                    productRepository.plusOneProductTotalSold(order.getProduct().getId());
+                    statistic(order.getTotalPrice(), order.getQuantity(), order);
+                } else if (updateStatusOrderRequest.getStatus() != CANCELED_STATUS) {
+                    throw new BadRequestException("Không thế chuyển sang trạng thái này");
+                }
+                //Đơn hàng ở trạng thái đang giao hàng
+            } else if (order.getStatus() == DELIVERY_STATUS) {
+                //Đơn hàng ở trạng thái đã giao hàng
+                if (updateStatusOrderRequest.getStatus() == COMPLETED_STATUS) {
+                    //Cộng một sản phẩm vào sản phẩm đã bán và cộng tiền
+                    productRepository.plusOneProductTotalSold(order.getProduct().getId());
+                    statistic(order.getTotalPrice(), order.getQuantity(), order);
+                    //Đơn hàng ở trạng thái đã hủy
+                } else if (updateStatusOrderRequest.getStatus() == RETURNED_STATUS) {
+                    //Cộng lại một sản phẩm đã bị trừ
+                    productSizeRepository.plusOneProductBySize(order.getProduct().getId(), order.getSize());
+                    //Đơn hàng ở trạng thái đã trả hàng
+                } else if (updateStatusOrderRequest.getStatus() == CANCELED_STATUS) {
+                    //Cộng lại một sản phẩm đã bị trừ
+                    productSizeRepository.plusOneProductBySize(order.getProduct().getId(), order.getSize());
+                } else if (updateStatusOrderRequest.getStatus() != DELIVERY_STATUS) {
+                    throw new BadRequestException("Không thế chuyển sang trạng thái này");
+                }
+                //Đơn hàng ở trạng thái đã giao hàng
+            } else if (order.getStatus() == COMPLETED_STATUS) {
+                //Đơn hàng đang ở trạng thái đã hủy
+                if (updateStatusOrderRequest.getStatus() == RETURNED_STATUS) {
+                    //Cộng một sản phẩm đã bị trừ và trừ đi một sản phẩm đã bán và trừ số tiền
+                    productSizeRepository.plusOneProductBySize(order.getProduct().getId(), order.getSize());
+                    productRepository.minusOneProductTotalSold(order.getProduct().getId());
+                    updateStatistic(order.getTotalPrice(), order.getQuantity(), order);
+                } else if (updateStatusOrderRequest.getStatus() != COMPLETED_STATUS) {
+                    throw new BadRequestException("Không thế chuyển sang trạng thái này");
+                }
+            } else {
+                if (order.getStatus() != updateStatusOrderRequest.getStatus()) {
+                    throw new BadRequestException("Không thế chuyển đơn hàng sang trạng thái này");
+                }
+            }
+
+            User user = new User();
+            user.setId(userId);
+            order.setModifiedBy(user);
+            order.setModifiedAt(new Timestamp(System.currentTimeMillis()));
+            order.setNote(updateStatusOrderRequest.getNote());
+            order.setStatus(updateStatusOrderRequest.getStatus());
+            try {
+                orderRepository.save(order);
+            } catch (Exception e) {
+                throw new InternalServerException("Lỗi khi cập nhật trạng thái");
+            }
+        }
+    }
+
+    @Override
     public List<OrderInfoDTO> getListOrderOfPersonByStatus(int status, long userId) {
         List<OrderInfoDTO> list = orderRepository.getListOrderOfPersonByStatus(status, userId);
 
@@ -385,9 +479,10 @@ public class OrderServiceImpl implements OrderService {
             order.setStatus(ORDER_STATUS);
             order.setProductIds(productSize.getProductId());
             order.setBillCode(uuid);
-            order.setSize(proId.getSize());;
+            order.setSize(proId.getSize());
+            ;
             KeyHolder keyHolder = new GeneratedKeyHolder();
-            orderRepositoryImpl .save(order,keyHolder);
+            orderRepositoryImpl.save(order, keyHolder);
             Number id = keyHolder.getKey();
             res.add(id);
         }
@@ -423,5 +518,34 @@ public class OrderServiceImpl implements OrderService {
             statistic.setProfit(statistic.getSales() - (statistic.getQuantity() * order.getProduct().getPrice()));
             statisticRepository.save(statistic);
         }
+    }
+
+    public List<OrderResponse> getSummary(Long userId, Integer status) {
+        if (userId == null) {
+            throw new BadRequestException("userId không được bỏ trống");
+        }
+
+        if (status == null) {
+            throw new BadRequestException("status không được bỏ trống");
+        }
+        List<OrderResponse> orders = orderRepositoryImpl.getSummary(userId, status);
+        return orders;
+    }
+
+    public List<OrderResponse> getByStatus( Integer status) {
+
+        if (status == null) {
+            throw new BadRequestException("status không được bỏ trống");
+        }
+        List<OrderResponse> orders = orderRepositoryImpl.getByStatus( status);
+        return orders;
+    }
+
+    public List<OrderDetailResponse> getDetailByBillCode(String billCode) {
+        if (billCode == null || billCode.isEmpty()) {
+            throw new BadRequestException("userId không được bỏ trống");
+        }
+        List<OrderDetailResponse> orders = orderRepositoryImpl.getDetail(billCode);
+        return orders;
     }
 }

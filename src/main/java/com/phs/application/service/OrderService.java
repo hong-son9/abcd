@@ -19,6 +19,7 @@ public interface OrderService {
     Order createOrder(CreateOrderRequest createOrderRequest, long userId);
 
     void updateDetailOrder(UpdateDetailOrder updateDetailOrder, long id, long userId);
+    void updateStatusOrderV2(UpdateStatusOrderRequest updateDetailOrder, String billCode, long userId);
 
     Order findOrderById(long id);
 
