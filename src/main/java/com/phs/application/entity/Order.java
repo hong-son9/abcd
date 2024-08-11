@@ -128,6 +128,8 @@ public class Order {
     @Column(name = "promotion", columnDefinition = "json")
     private UsedPromotion promotion;
 
+    private String productIds;
+
     @Getter
     @Setter
     @NoArgsConstructor

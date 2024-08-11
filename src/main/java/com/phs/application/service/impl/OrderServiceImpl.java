@@ -4,16 +4,13 @@ import com.phs.application.entity.*;
 import com.phs.application.exception.BadRequestException;
 import com.phs.application.exception.InternalServerException;
 import com.phs.application.exception.NotFoundException;
-import com.phs.application.repository.OrderRepository;
-import com.phs.application.repository.ProductRepository;
-import com.phs.application.repository.ProductSizeRepository;
-import com.phs.application.repository.StatisticRepository;
-import com.phs.application.entity.*;
 import com.phs.application.model.dto.OrderDetailDTO;
 import com.phs.application.model.dto.OrderInfoDTO;
 import com.phs.application.model.request.CreateOrderRequest;
+import com.phs.application.model.request.CreateOrderRequestV2;
 import com.phs.application.model.request.UpdateDetailOrder;
 import com.phs.application.model.request.UpdateStatusOrderRequest;
+import com.phs.application.repository.*;
 import com.phs.application.service.OrderService;
 import com.phs.application.service.PromotionService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,9 +18,13 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -39,7 +40,13 @@ public class OrderServiceImpl implements OrderService {
     private ProductSizeRepository productSizeRepository;
 
     @Autowired
+    private ProductSizeRepositoryImpl productSizeRepositoryImpl;
+
+    @Autowired
     private OrderRepository orderRepository;
+
+    @Autowired
+    private OrderRepositoryImpl orderRepositoryImpl;
 
     @Autowired
     private PromotionService promotionService;
@@ -326,15 +333,74 @@ public class OrderServiceImpl implements OrderService {
         return orderRepository.count();
     }
 
+    @Transactional
+    @Override
+    public List<Number> createOrderV2(CreateOrderRequestV2 createOrderRequest, long userId) {
+        //Kiểm tra sản phẩm có tồn tại
+        for (ProductSize proId : createOrderRequest.getProducts()) {
+            Optional<Product> product = productRepository.findById(proId.getProductId());
+            if (product.isEmpty()) {
+                throw new NotFoundException("Sản phẩm không tồn tại!");
+            }
+        }
+
+//        //Kiểm tra size có sẵn
+//        for (ProductSize proId : createOrderRequest.getProducts()) {
+//            ProductSize productSize = productSizeRepository.checkProductAndSizeAvailable(proId.getProductId(), proId.getSize());
+//            if (productSize == null) {
+//                throw new BadRequestException("sản phẩm tạm hết, Vui lòng chọn sản phẩm khác!");
+//            }
+////            trừ số lượng sp
+//            productSizeRepositoryImpl.update(productSize);
+////             insert dữ liệu vào bảng map
+//
+//        }
+
+
+        List<Number> res = new ArrayList<>();
+
+        for (ProductSize proId : createOrderRequest.getProducts()) {
+            ProductSize productSize = productSizeRepository.checkProductAndSizeAvailable(proId.getProductId(), proId.getSize());
+            if (productSize == null) {
+                throw new BadRequestException("sản phẩm tạm hết, Vui lòng chọn sản phẩm khác!");
+            }
+//            trừ số lượng sp
+            productSizeRepositoryImpl.update(productSize);
+//             insert dữ liệu vào bảng map
+            Order order = new Order();
+            User user = new User();
+            user.setId(userId);
+            order.setCreatedBy(user);
+            order.setQuantity(createOrderRequest.getProducts().size());
+            order.setBuyer(user);
+            order.setCreatedAt(new Timestamp(System.currentTimeMillis()));
+            order.setReceiverAddress(createOrderRequest.getReceiverAddress());
+            order.setReceiverName(createOrderRequest.getReceiverName());
+            order.setReceiverPhone(createOrderRequest.getReceiverPhone());
+            order.setNote(createOrderRequest.getNote());
+//        order.setSize(createOrderRequest.getSize());
+            order.setPrice(createOrderRequest.getProductPrice());
+            order.setTotalPrice(createOrderRequest.getProductPrice() - createOrderRequest.getTotalPrice());
+            order.setStatus(ORDER_STATUS);
+            order.setProductIds(productSize.getProductId());
+            KeyHolder keyHolder = new GeneratedKeyHolder();
+            orderRepositoryImpl .save(order,keyHolder);
+            Number id = keyHolder.getKey();
+            res.add(id);
+        }
+
+        return res;
+    }
+
     public void statistic(long amount, int quantity, Order order) {
         Statistic statistic = statisticRepository.findByCreatedAT();
-        if (statistic != null){
+        if (statistic != null) {
             statistic.setOrder(order);
             statistic.setSales(statistic.getSales() + amount);
             statistic.setQuantity(statistic.getQuantity() + quantity);
             statistic.setProfit(statistic.getSales() - (statistic.getQuantity() * order.getProduct().getPrice()));
             statisticRepository.save(statistic);
-        }else {
+        } else {
             Statistic statistic1 = new Statistic();
             statistic1.setOrder(order);
             statistic1.setSales(amount);

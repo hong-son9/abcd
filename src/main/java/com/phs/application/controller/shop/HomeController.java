@@ -1,6 +1,7 @@
 package com.phs.application.controller.shop;
 
 import com.phs.application.entity.*;
+import com.phs.application.model.request.CreateOrderRequestV2;
 import com.phs.application.model.response.ProductResponse;
 import com.phs.application.service.*;
 import com.phs.application.entity.*;
@@ -165,6 +166,14 @@ public class HomeController {
         Order order = orderService.createOrder(createOrderRequest, user.getId());
 
         return ResponseEntity.ok(order.getId());
+    }
+
+    @PostMapping("/api/orders/v2")
+    public ResponseEntity<Object> createOrderV2( @RequestBody CreateOrderRequestV2 createOrderRequest) {
+        User user = ((CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUser();
+        List<Number> order = orderService.createOrderV2(createOrderRequest, user.getId());
+
+        return ResponseEntity.ok(order);
     }
 
 //    @GetMapping("/products")
