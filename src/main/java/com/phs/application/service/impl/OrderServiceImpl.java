@@ -480,7 +480,6 @@ public class OrderServiceImpl implements OrderService {
             order.setProductIds(productSize.getProductId());
             order.setBillCode(uuid);
             order.setSize(proId.getSize());
-            ;
             KeyHolder keyHolder = new GeneratedKeyHolder();
             orderRepositoryImpl.save(order, keyHolder);
             Number id = keyHolder.getKey();

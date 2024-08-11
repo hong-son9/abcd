@@ -25,9 +25,9 @@ public class OrderRepositoryImpl {
 
     public int save(Order request, KeyHolder keyHolder) {
         String sql = "INSERT INTO orders(created_at, note, price, promotion, quantity, receiver_address, receiver_name,\n" +
-                "                   receiver_phone, status, total_price, buyer, created_by,product_id,bill_code,size)\n" +
+                "                   receiver_phone, status, total_price, buyer, created_by,product_id,bill_code,`size`)\n" +
                 "VALUES (:created_at, :note, :price, :promotion, :quantity, :receiver_address, :receiver_name,\n" +
-                "        :receiver_phone, :status, :total_price, :buyer, :created_by,:product_id,:bill_code,size)\n";
+                "        :receiver_phone, :status, :total_price, :buyer, :created_by,:product_id,:bill_code,:size)\n";
         MapSqlParameterSource param = new MapSqlParameterSource();
         param.addValue("created_at", request.getCreatedAt());
         param.addValue("note", request.getNote());

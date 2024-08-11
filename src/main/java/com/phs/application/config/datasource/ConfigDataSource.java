@@ -11,11 +11,11 @@ import javax.sql.DataSource;
 public class ConfigDataSource {
 
     public static final String MYSQL_DRIVER_CLASS_NAME = "com.mysql.jdbc.Driver";
-    public static final String URL = "jdbc:mysql://localhost:3333/shoes?useUnicode=yes&characterEncoding=UTF-8&useSSL=false&createDatabaseIfNotExist=true&serverTimezone=UTC";
+    public static final String URL = "jdbc:mysql://localhost:3306/shoes?useUnicode=yes&characterEncoding=UTF-8&useSSL=false&createDatabaseIfNotExist=true&serverTimezone=UTC";
 
     public static final String USERNAME = "root";
 
-    public static final String PASSWORD = "12345";
+    public static final String PASSWORD = "123456";
 
     @Bean
     public DataSource dataSource() {
