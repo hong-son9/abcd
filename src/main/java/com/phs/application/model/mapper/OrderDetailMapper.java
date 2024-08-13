@@ -19,6 +19,7 @@ public class OrderDetailMapper implements RowMapper<OrderDetailResponse> {
         order.setQuantity(resultSet.getInt("quantity"));
 //        order.setCreatedAt(resultSet.getTimestamp("created_at"));
         order.setBillCode(resultSet.getString("bill_code"));
+        order.setProductId(resultSet.getString("product_id"));
         return order;
     }
 }

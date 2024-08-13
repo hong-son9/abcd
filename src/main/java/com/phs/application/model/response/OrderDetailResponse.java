@@ -14,4 +14,5 @@ public class OrderDetailResponse {
     private String receiverPhone;
     private int quantity;
     private String note;
+    private String productId;
 }
