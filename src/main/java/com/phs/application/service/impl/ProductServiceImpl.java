@@ -137,6 +137,7 @@ public class ProductServiceImpl implements ProductService {
         return product.get();
     }
 
+
     @Override
     public void deleteProduct(String[] ids) {
         for (String id : ids) {
