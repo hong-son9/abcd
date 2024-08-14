@@ -141,7 +141,7 @@
 
                         let tableBody = uniqueOrdersArray.map((order, index) => `
                             <tr>
-                                <td class="order-detail" data-billcode="${order.billCode}">${index + 1}</td>
+                                <td class="order-detail" data-billcode="${order.billCode}" data-totalprice="${order.totalPrice}">${index + 1}</td>
                                 <td>${order.billCode || ''}</td>
                                 <td>${order.quantity || ''}</td>
                                 <td>${order.totalPrice || ''}</td>
@@ -173,7 +173,7 @@
             // Sự kiện click vào cột STT để lấy chi tiết đơn hàng
             $(document).on('click', '.order-detail', function () {
                 let billCode = $(this).data('billcode');
-                let totalprice = $(this).data('totalprice');
+                let totalPrice = $(this).data('totalprice');
                 let apiUrl = `http://localhost:9999/api/orders/detail?billCode=${billCode}`;
 
                 $.ajax({
@@ -238,7 +238,7 @@
                                         <div id="receiver-address" style="margin-top: 10px;"></div>
                                         <div id="receiver-phone" style="margin-top: 10px;"></div>
                                         <div id="note" style="margin-top: 10px;"></div>
-                                        <div id="totalprices" style="margin-top: 10px;"></div>
+                                        <div id="totalprices" style="margin-top: 10px;">Total Prices: ${totalPrice}</div> <!-- Hiển thị giá tổng -->
                                         ${detailTable}
                                     </td>
                                 </tr>
@@ -252,7 +252,7 @@
                             $('#receiver-address').text(`Receiver Address: ${data[0].receiverAddress || ''}`);
                             $('#receiver-phone').text(`Receiver Phone: ${data[0].receiverPhone || ''}`);
                             $('#note').text(`Note: ${data[0].note || ''}`);
-                            $('#totalprices').text(`totalprices: ${totalprice}`);
+                            $('#totalprices').text(`totalPrice: ${totalPrice}`);
                         });
                     },
                     error: function (error) {
