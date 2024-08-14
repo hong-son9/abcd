@@ -9,10 +9,12 @@ import com.phs.application.model.request.ChangePasswordRequest;
 import com.phs.application.model.request.CreateUserRequest;
 import com.phs.application.model.request.LoginRequest;
 import com.phs.application.model.request.UpdateProfileRequest;
+import com.phs.application.model.response.ResponseOK;
 import com.phs.application.security.CustomUserDetails;
 import com.phs.application.security.JwtTokenUtil;
 import com.phs.application.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -21,10 +23,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
@@ -102,22 +101,32 @@ public class UserController {
         return "shop/account";
     }
 
-    @PostMapping("/api/change-password")
-    public ResponseEntity<Object> changePassword(@Valid @RequestBody ChangePasswordRequest passwordReq) {
-        User user = ((CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUser();
+    @PostMapping("/api/change-password/{userId}")
+    public ResponseEntity<ResponseOK> changePassword(@Valid @PathVariable Long userId, @RequestBody ChangePasswordRequest passwordReq) {
+        User user = userService.findById(userId);
+
+        if (user == null) {
+            ResponseOK response = new ResponseOK("404", "FAIL", "User not found");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+        }
         userService.changePassword(user, passwordReq);
-        return ResponseEntity.ok("Đổi mật khẩu thành công");
+        ResponseOK response = new ResponseOK("200", "OK", "SUCCESS");
+        return ResponseEntity.ok(response);
     }
 
-    @PutMapping("/api/update-profile")
-    public ResponseEntity<Object> updateProfile(@Valid @RequestBody UpdateProfileRequest profileReq) {
-        User user = ((CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUser();
+    @PutMapping("/api/update-profile/{userId}")
+    public ResponseEntity<ResponseOK> updateProfile(@PathVariable Long userId, @Valid @RequestBody UpdateProfileRequest profileReq) {
+        User user = userService.findById(userId);
+
+        if (user == null) {
+            ResponseOK response = new ResponseOK("404", "FAIL", "User not found");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+        }
 
         user = userService.updateProfile(user, profileReq);
-        UserDetails userDetails = new CustomUserDetails(user);
-        Authentication authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-
-        return ResponseEntity.ok("Cập nhật thành công");
+        ResponseOK response = new ResponseOK("200", "OK", "SUCCESS");
+        return ResponseEntity.ok(response);
     }
+
+
 }
