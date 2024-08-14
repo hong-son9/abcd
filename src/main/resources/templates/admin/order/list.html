@@ -68,9 +68,9 @@
             <h2 class="card-title">Danh sách đơn hàng</h2>
         </header>
         <section class="card">
-            <header class="card-header">
-                <h2 class="card-title">Chi tiết trạng thái đơn hàng</h2>
-            </header>
+<!--            <header class="card-header">-->
+<!--                <h2 class="card-title">Chi tiết trạng thái đơn hàng</h2>-->
+<!--            </header>-->
             <div class="card-body">
                 <table class="table table-bordered table-striped mb-0">
                     <thead>
@@ -133,9 +133,9 @@
                         let tableHead = `
                             <tr>
                                 <th>STT</th>
-                                <th>Bill Code</th>
-                                <th>Quantity</th>
-                                <th>Total Price</th>
+                                <th>Mã đơn hàng</th>
+                                <th>Số lượng</th>
+                                <th>Tổng giá</th>
                             </tr>
                         `;
 
@@ -185,9 +185,10 @@
                             <table class="table table-bordered table-striped mb-0 detail-table">
                                 <thead>
                                     <tr>
-                                        <th>Product Name</th>
-                                        <th>Quantity</th>
-                                        <th>Prices</th>
+                                        <th>STT</th>
+                                        <th>Tên sản phẩm</th>
+                                        <th>Số lượng</th>
+                                        <th>Giá</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -196,7 +197,8 @@
                         // Tạo một mảng để lưu các yêu cầu API cho tên sản phẩm
                         let productRequests = [];
 
-                        data.forEach(item => {
+                        let index = 1
+                        data.forEach((item) => {
                             productRequests.push(
                                 $.ajax({
                                     url: productApiUrl + item.productId,
@@ -204,6 +206,7 @@
                                     success: function (productData) {
                                         detailTable += `
                                             <tr>
+                                                <td>${index ++}</td>
                                                 <td>${productData.name || ''}</td>
                                                 <td>${item.quantity || ''}</td>
                                                 <td>${productData.prices || ''}</td>
@@ -235,8 +238,8 @@
                                         </div>
                                         <div id="current-billcode" style="margin-top: 10px;">Bill Code: ${billCode}</div>
                                         <div id="receiver-name" style="margin-top: 10px;"></div>
-                                        <div id="receiver-address" style="margin-top: 10px;"></div>
                                         <div id="receiver-phone" style="margin-top: 10px;"></div>
+                                        <div id="receiver-address" style="margin-top: 10px;"></div>
                                         <div id="note" style="margin-top: 10px;"></div>
                                         <div id="totalprices" style="margin-top: 10px;">Total Prices: ${totalPrice}</div> <!-- Hiển thị giá tổng -->
                                         ${detailTable}
@@ -245,14 +248,14 @@
                             `);
 
                             // Hiển thị mã billCode hiện tại
-                            $('#current-billcode').text(`Bill Code: ${billCode}`);
+                            $('#current-billcode').text(`Mã đơn hàng: ${billCode}`);
 
                             // Hiển thị thông tin nhận hàng
-                            $('#receiver-name').text(`Receiver Name: ${data[0].receiverName || ''}`);
-                            $('#receiver-address').text(`Receiver Address: ${data[0].receiverAddress || ''}`);
-                            $('#receiver-phone').text(`Receiver Phone: ${data[0].receiverPhone || ''}`);
-                            $('#note').text(`Note: ${data[0].note || ''}`);
-                            $('#totalprices').text(`totalPrice: ${totalPrice}`);
+                            $('#receiver-name').text(`Người nhận: ${data[0].receiverName || ''}`);
+                            $('#receiver-phone').text(`Số điện thoại: ${data[0].receiverPhone || ''}`);
+                            $('#receiver-address').text(`Địa chỉ: ${data[0].receiverAddress || ''}`);
+                            $('#note').text(`Ghi chú: ${data[0].note || ''}`);
+                            $('#totalprices').text(`Tổng tiền: ${totalPrice}`);
                         });
                     },
                     error: function (error) {
