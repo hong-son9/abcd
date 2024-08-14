@@ -1,105 +1,27 @@
 <th:block th:fragment="header">
-    <header class="header">
-        <div class="header-middle">
-            <div class="container">
-                <div class="header-left col-lg-2 w-auto pl-0">
-                    <button class="mobile-menu-toggler text-primary mr-2" type="button">
-                        <i class="icon-menu"></i>
-                    </button>
-                    <a href="/" class="logo">
-                        <img th:src="@{/shop/images/slider/logo2.jpg}"  alt="logo">
-                    </a>
-                </div><!-- End .header-left -->
+    <style>
+        /* Căn chỉnh container chứa icon và nút đăng xuất ra giữa màn hình */
+        .center-container {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center; /* Căn giữa nội dung bên trong container */
+        }
 
-                <div class="header-right w-lg-max" style="margin-bottom: 45px;">
-                    <div class="header-icon header-icon header-search header-search-inline header-search-category w-lg-max text-right">
-                        <a href="#" class="search-toggle search-button" role="button"><i class="icon-search-3"></i></a>
-                        <style>.header-search-wrapper {
-                            display: flex;
-                            flex-direction: column;
-                            align-items: flex-start;
-                        }
-                        .header-links a:after {
-                            content: "|";
-                            margin-left: 50px;
-                        }
-                        .header-links a:last-child:after {
-                            content: "";
-                        }
-                        .header-links i {
-                            margin-left: 5px;
-                        }
-                        .search-input-group {
-                            display: flex;
-                            align-items: center;
-                        }
+        /* Căn chỉnh và thay đổi kích cỡ icon */
+        .header-icon.account-setting {
+            font-size: 48px; /* Tăng kích cỡ biểu tượng */
+            color: #000; /* Màu của biểu tượng */
+            display: block; /* Đảm bảo icon là block-level element để căn giữa */
+            margin-bottom: 20px; /* Khoảng cách dưới icon để có chỗ cho nút đăng xuất */
+        }
 
+    </style>
 
-                        </style>
-                        <div class="header-search-wrapper">
-                            <div class="header-links" style="margin-bottom: 7px; font-weight: bold; color: black; ">
-                                <a  href="#" style="margin-right: 60px;">Kênh Người Bán</a>
-                                <a href="#" style="margin-right: 60px;">Tải ứng dụng</a>
-                                <a href="#" style="margin-right: 60px;">Kết nối
-                                    <i class="fab fa-facebook"></i>
-                                    <i class="fab fa-instagram"></i>
-                                    <i class="fab fa-twitter"></i>
-
-                                </a>
-                            </div>
-                            <div class="search-input-group">
-                                <input  class="form-control search-input" style="width: 600px;" placeholder="Nhập sản phẩm cần tìm kiếm..." required>
-                                <button style="height: 40px;" class="btn icon-search-3 p-0 search-button" type="submit"></button>
-                            </div>
-                            <style>.horizontal-list {
-                                list-style-type: none;
-                                margin-top: 12px;
-                                padding: 0;
-                                display: flex; /* Sử dụng flexbox để xếp các mục theo chiều ngang */
-                                flex-wrap: wrap; /* Cho phép các mục xuống dòng nếu không đủ không gian */
-                            }
-
-                            .horizontal-list li {
-                                margin-right: 50px; /* Để lại khoảng trống giữa các mục */
-                            }
-                            </style>
-                            <ul class="horizontal-list">
-                                <li style="margin-left: 50px;">Van</li>
-                                <li>Nike</li>
-                                <li>Adidas</li>
-                                <li>Puma</li>
-                                <li>Converse</li>
-                                <li>Balenciaga</li>
-                            </ul>
-                        </div><!-- End .header-search-wrapper -->
-                    </div><!-- End .header-search -->
-
-                    <div class="header-contact d-none d-lg-flex pl-4 ml-3 mr-xl-5 pr-4">
-                        <img alt="phone" th:src="@{/shop/images/icon-phone.png}" width="30" height="30" class="pb-1">
-                        <h6>Hotline<a href="tel:#" class="text-dark font1">036 545 4643</a></h6>
-                    </div>
-
-                    <a href="" data-toggle="modal" data-target="#exampleModal" class="header-icon account-setting"><i class="icon-user-2"></i></a>
-
-                </div><!-- End .header-right -->
-            </div><!-- End .container -->
-        </div><!-- End .header-middle -->
-
-        <div class="header-bottom sticky-header d-none d-lg-block">
-            <div class="container">
-                <nav class="main-nav w-100">
-                    <ul class="menu">
-                        <li class="active"><a href="/">Trang chủ</a></li>
-                        <li class=""><a href="/san-pham">Sản phẩm</a></li>
-                        <li class=""><a href="/lien-he" class="px-4">Liên hệ</a></li>
-                        <li class=""><a href="/tin-tuc">Tin tức</a></li>
-                        <li class=""><a href="/doi-hang">Chính sách</a></li>
-                        <li class=""><a href="/huong-dan">Hướng dẫn mua hàng</span></a></li>
-                    </ul>
-                </nav>
-            </div><!-- End .container -->
-        </div><!-- End .header-bottom -->
-    </header><!-- End .header -->
-
+    <div class="center-container">
+        <a href="" data-toggle="modal" data-target="#exampleModal" class="header-icon account-setting"><i class="icon-user-2"></i></a>
+        <a class="btn btn-primary red-btn sign-out-btn" href="/api/logout">Đăng xuất</a>
+    </div>
+    <script></script>
 </th:block>
-

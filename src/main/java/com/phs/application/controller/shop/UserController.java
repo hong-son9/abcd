@@ -90,6 +90,7 @@ public class UserController {
             response.addCookie(cookie);
 
             return ResponseEntity.ok(UserMapper.toUserDTO(((CustomUserDetails) authentication.getPrincipal()).getUser()));
+
         } catch (Exception ex) {
             throw new BadRequestException("Email hoặc mật khẩu không chính xác!");
 
@@ -127,6 +128,4 @@ public class UserController {
         ResponseOK response = new ResponseOK("200", "OK", "SUCCESS");
         return ResponseEntity.ok(response);
     }
-
-
 }
