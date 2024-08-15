@@ -149,6 +149,10 @@ public class PostServiceImpl implements PostService {
         return postRepository.adminGetListPosts(title, status, pageable);
     }
 
+    public List<Post> getAllPosts() {
+        return postRepository.findAll();
+    }
+
     @Override
     public List<Post> getLatesPost() {
         return postRepository.getLatesPosts(PUBLIC_POST, LIMIT_POST_NEW);

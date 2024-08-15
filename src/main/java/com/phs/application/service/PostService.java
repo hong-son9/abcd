@@ -22,7 +22,7 @@ public interface PostService {
     Post getPostById(long id);
 
     Page<Post> adminGetListPosts(String title, String status, Integer page);
-
+    List<Post> getAllPosts();
     List<Post> getLatesPost();
 
     Page<Post> getListPost(int page);
