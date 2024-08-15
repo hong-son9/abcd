@@ -14,7 +14,7 @@ public class OrderDetailMapper implements RowMapper<OrderDetailResponse> {
         order.setReceiverAddress(resultSet.getString("receiver_address"));
         order.setNote(resultSet.getString("note"));
         order.setReceiverName(resultSet.getString("receiver_name"));
-        order.setReceiverName(resultSet.getString("receiver_phone"));
+        order.setReceiverPhone(resultSet.getString("receiver_phone"));
         order.setPrices(resultSet.getLong("prices"));
         order.setQuantity(resultSet.getInt("quantity"));
 //        order.setCreatedAt(resultSet.getTimestamp("created_at"));

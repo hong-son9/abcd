@@ -3,10 +3,9 @@ package com.phs.application.controller.shop;
 import com.phs.application.entity.*;
 import com.phs.application.exception.BadRequestException;
 import com.phs.application.exception.NotFoundException;
-import com.phs.application.model.dto.CheckPromotion;
-import com.phs.application.model.dto.DetailProductInfoDTO;
-import com.phs.application.model.dto.PageableDTO;
-import com.phs.application.model.dto.ProductInfoDTO;
+import com.phs.application.model.ProductDTO1;
+import com.phs.application.model.ProductResponse1;
+import com.phs.application.model.dto.*;
 import com.phs.application.model.request.CreateOrderRequest;
 import com.phs.application.model.request.CreateOrderRequestV2;
 import com.phs.application.model.request.FilterProductRequest;
@@ -25,6 +24,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static com.phs.application.config.Contant.*;
 
@@ -219,6 +219,18 @@ public class HomeController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
         }
     }
+    @GetMapping("api/product/{product_id}")
+    public ResponseEntity<ProductDTO1> getProductById(@PathVariable String product_id) {
+
+            Product productInfoDTO = productService.getProductById(product_id);
+            if (productInfoDTO != null) {
+                ProductDTO1 productDTO = new ProductDTO1(productInfoDTO.getId(), productInfoDTO.getName(), String.valueOf(productInfoDTO.getPrice()));
+                return ResponseEntity.ok(productDTO);
+            } else {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+            }
+    }
+
 
 
     @GetMapping("/san-pham")
