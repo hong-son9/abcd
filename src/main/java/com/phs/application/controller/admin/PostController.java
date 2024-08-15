@@ -2,6 +2,7 @@ package com.phs.application.controller.admin;
 
 import com.phs.application.entity.Post;
 import com.phs.application.entity.User;
+import com.phs.application.model.dto.PostDTO1;
 import com.phs.application.model.request.CreatePostRequest;
 import com.phs.application.security.CustomUserDetails;
 import com.phs.application.service.ImageService;
@@ -62,8 +63,8 @@ public class PostController {
     }
 
     @GetMapping("/posts")
-    public ResponseEntity<List<Post>> getAllPosts() {
-        List<Post> posts = postService.getAllPosts();
+    public ResponseEntity<List<PostDTO1>> getAllPosts() {
+        List<PostDTO1> posts = postService.getAllPosts();
         return ResponseEntity.ok(posts);
     }
 

@@ -4,8 +4,10 @@ import com.github.slugify.Slugify;
 import com.phs.application.exception.BadRequestException;
 import com.phs.application.exception.InternalServerException;
 import com.phs.application.exception.NotFoundException;
+import com.phs.application.model.dto.PostDTO1;
 import com.phs.application.repository.PostRepository;
 import com.phs.application.entity.Post;
+import com.phs.application.entity.Comment;
 import com.phs.application.entity.User;
 import com.phs.application.model.dto.PageableDTO;
 import com.phs.application.model.dto.PostDTO;
@@ -18,10 +20,15 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
-
+import java.time.LocalDateTime;
 import java.sql.Timestamp;
+import java.time.ZoneId;
+import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.time.format.DateTimeFormatter;
 
 import static com.phs.application.config.Contant.*;
 
@@ -149,8 +156,39 @@ public class PostServiceImpl implements PostService {
         return postRepository.adminGetListPosts(title, status, pageable);
     }
 
-    public List<Post> getAllPosts() {
-        return postRepository.findAll();
+    public List<PostDTO1> getAllPosts() {
+        List<Post> posts = postRepository.findAll();
+        return posts.stream().map(this::convertToPostDTO).collect(Collectors.toList());
+    }
+
+    private PostDTO1 convertToPostDTO(Post post) {
+        PostDTO1 postDTO = new PostDTO1();
+        postDTO.setId(post.getId());
+        postDTO.setTitle(post.getTitle());
+        postDTO.setContent(post.getContent());
+        postDTO.setDescription(post.getDescription());
+        postDTO.setSlug(post.getSlug());
+        postDTO.setThumbnail(post.getThumbnail());
+        postDTO.setCreatedAt(post.getCreatedAt() != null
+                ? new Date(post.getCreatedAt().getTime()).toString()
+                : null);
+        postDTO.setModifiedAt(post.getModifiedAt() != null
+                ? new Date(post.getModifiedAt().getTime()).toString()
+                : null);
+
+        postDTO.setCreatedBy(post.getCreatedBy() != null ? post.getCreatedBy().getFullName() : null);
+        postDTO.setModifiedBy(post.getModifiedBy() != null ? post.getModifiedBy().getFullName() : null);
+        postDTO.setPublishedAt(post.getPublishedAt());
+        postDTO.setStatus(post.getStatus());
+        postDTO.setComments(
+                post.getComments() != null
+                        ? post.getComments().stream()
+                        .map(Comment::getContent)
+                        .collect(Collectors.toList())
+                        : Collections.emptyList()
+        );
+
+        return postDTO;
     }
 
     @Override
