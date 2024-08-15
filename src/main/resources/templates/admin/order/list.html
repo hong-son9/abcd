@@ -141,7 +141,7 @@
 
                         let tableBody = uniqueOrdersArray.map((order, index) => `
                             <tr>
-                                <td class="order-detail" data-billcode="${order.billCode}" data-totalprice="${order.totalPrice}" style="color: red;">${index + 1}</td>
+                                <td style="color:red;" class="order-detail" data-billcode="${order.billCode}" data-totalprice="${order.totalPrice}">${index + 1}</td>
                                 <td>${order.billCode || ''}</td>
                                 <td>${order.quantity || ''}</td>
                                 <td>${order.totalPrice || ''}</td>
@@ -206,7 +206,7 @@
                                     success: function (productData) {
                                         detailTable += `
                                             <tr>
-                                                <td">${index ++}</td>
+                                                <td>${index ++}</td>
                                                 <td>${productData.name || ''}</td>
                                                 <td>${item.quantity || ''}</td>
                                                 <td>${productData.prices || ''}</td>
@@ -234,7 +234,7 @@
                                     <td colspan="6">
                                         <div class="detail-header">
                                             <h4>Chi tiết đơn hàng</h4>
-                                           <a class="edit-order-status" href="javascript:void(0)" style="color: red">Sửa chi tiết đơn hàng</a>
+                                           <a class="edit-order-status" href="javascript:void(0)" style="color: red;">Sửa chi tiết đơn hàng</a>
                                             <span class="close-detail">X</span>
                                         </div>
                                         <div id="current-billcode" style="margin-top: 10px;">Bill Code: ${billCode}</div>
