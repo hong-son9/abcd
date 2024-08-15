@@ -51,5 +51,6 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
 //                "JOIN o.product p " +
 //                "where o.id = :id")
 //        OrderDetailDTO getOrderDetail(long id, long userId);
-
+    @Query("SELECT COUNT(DISTINCT o.billCode) FROM Order o")
+    long countDistinctBillCodes();
 }
