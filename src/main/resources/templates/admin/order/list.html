@@ -175,7 +175,10 @@
                 let billCode = $(this).data('billcode');
                 let totalPrice = $(this).data('totalprice');
                 let apiUrl = `http://localhost:9999/api/orders/detail?billCode=${billCode}`;
-
+                //$('.detail-container').removeClass('show');
+                $('.detail-container').remove();
+                // Xóa các chi tiết cũ nếu có
+                //$('#order-details').find('.detail-container').remove();
                 $.ajax({
                     url: apiUrl,
                     method: 'GET',
@@ -230,7 +233,7 @@
                             detailTable += `</tbody></table>`;
                             // Thêm bảng chi tiết vào nội dung
                             $('#order-details').append(`
-                                <tr>
+                                <tr class = "detail-container">
                                     <td colspan="6">
                                         <div class="detail-header">
                                             <h4>Chi tiết đơn hàng</h4>
