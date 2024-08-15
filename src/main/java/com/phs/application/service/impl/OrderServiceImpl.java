@@ -504,7 +504,7 @@ public void updateStatusOrderV2(String billCode, int status) {
 
     @Override
     public long getCountOrder() {
-        return orderRepository.count();
+        return orderRepository.countDistinctBillCodes();
     }
 
     @Transactional
