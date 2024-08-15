@@ -68,9 +68,9 @@
             <h2 class="card-title">Danh sách đơn hàng</h2>
         </header>
         <section class="card">
-<!--            <header class="card-header">-->
-<!--                <h2 class="card-title">Chi tiết trạng thái đơn hàng</h2>-->
-<!--            </header>-->
+            <!--            <header class="card-header">-->
+            <!--                <h2 class="card-title">Chi tiết trạng thái đơn hàng</h2>-->
+            <!--            </header>-->
             <div class="card-body">
                 <table class="table table-bordered table-striped mb-0">
                     <thead>
@@ -234,6 +234,7 @@
                                     <td colspan="6">
                                         <div class="detail-header">
                                             <h4>Chi tiết đơn hàng</h4>
+                                           <a class="edit-order-status" href="javascript:void(0)">Sửa chi tiết đơn hàng</a>
                                             <span class="close-detail">X</span>
                                         </div>
                                         <div id="current-billcode" style="margin-top: 10px;">Bill Code: ${billCode}</div>
@@ -264,6 +265,57 @@
                     }
                 });
             });
+
+
+            $(document).on('click', '.edit-order-status', function () {
+                // Hiển thị dropdown chứa trạng thái đơn hàng
+                let statusDropdown = `
+        <div id="status-dropdown-container">
+            <select id="order-status-select">
+                <option value="1">Chờ lấy hàng</option>
+                <option value="2">Đang giao hàng</option>
+                <option value="3">Đã giao hàng</option>
+                <option value="4">Đơn hàng bị trả</option>
+                <option value="5">Đơn hàng bị hủy</option>
+            </select>
+            <button id="update-order-status">Cập nhật</button>
+        </div>
+    `;
+
+                // Thêm dropdown vào chi tiết đơn hàng
+                $(this).after(statusDropdown);
+
+                // Xử lý khi nhấn vào nút "Cập nhật"
+                $('#update-order-status').on('click', function () {
+                    // Lấy giá trị billCode từ chi tiết đơn hàng
+                    let billCode = $('#current-billcode').text().split(": ")[1]; // Lấy mã đơn hàng
+
+                    // Lấy giá trị trạng thái từ dropdown
+                    let selectedStatus = $('#order-status-select').val();
+
+                    // Gọi API để cập nhật trạng thái đơn hàng
+                    let updateApiUrl = `http://localhost:9999/api/update/status`;
+                    $.ajax({
+                        url: updateApiUrl,
+                        method: 'POST',
+                        data: {
+                            billCode: billCode,
+                            status: selectedStatus
+                        },
+                        success: function () {
+                            alert('Trạng thái đơn hàng đã được cập nhật.');
+                            location.reload();
+                            // Xóa dropdown sau khi cập nhật thành công
+                            $('#status-dropdown-container').remove();
+                        },
+                        error: function (error) {
+                            console.error('Error updating order status:', error);
+                            alert('Đã có lỗi xảy ra khi cập nhật trạng thái đơn hàng.');
+                        }
+                    });
+                });
+            });
+
 
             // Xóa chi tiết đơn hàng khi nhấp vào nút X
             $(document).on('click', '.close-detail', function () {
